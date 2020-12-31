@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "Utils.hpp"
 
 class Movie {
 	int id;
@@ -11,19 +12,21 @@ class Movie {
 	std::string description;
 	float rating;
 	std::vector<std::string> cast;
+	std::string addDate;
 	bool available;
 
-public:
-	Movie();
-	int getId();
-	std::string getName();
-	std::string getDirector();
-	int getLength();
-	std::string getDescription();
-	float getRating();
-	std::vector<std::string> getCast();
-	bool getAvailable();
-
+	Movie(
+		int newId,
+		std::string newName,
+		std::string newGenre,
+		std::string newDirector,
+		int newLength,
+		std::string newDescription,
+		float newRating,
+		std::vector<std::string> newCast,
+		std::string addDate,
+		bool newAvailable
+	);
 	void setId(int newId);
 	void setName(std::string newName);
 	void setGenre(std::string newGenre);
@@ -32,6 +35,18 @@ public:
 	void setDescription(std::string newDescription);
 	void setRating(float newRating);
 	void setCast(std::vector<std::string> newCast);
+	void setAddDate(std::string newAddDate);
 	void setAvailable(bool newAvailable);
-};
 
+public:
+	int getId();
+	std::string getName();
+	std::string getDirector();
+	int getLength();
+	std::string getDescription();
+	float getRating();
+	std::vector<std::string> getCast();
+	std::string getAddDate();
+	bool getAvailable();
+	Movie static vectorOfStringsToModel(std::vector<std::string>);
+};
