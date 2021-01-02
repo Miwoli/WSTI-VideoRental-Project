@@ -3,6 +3,6 @@
 #include "Movie.hpp"
 
 class Rent {
-	Movie movie
+	Movie movie;
 };
 

@@ -2,9 +2,16 @@
 //
 
 #include <iostream>
+#include "DB.hpp"
+#include "Movie.hpp"
+#include "Show.hpp"
 
 int main() {
-    std::cout << "Hello World!\n";
+
+    Show::mainMenu();
+
+    std::cout << "Press any key to exit...";
+    std::getchar();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

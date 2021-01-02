@@ -3,6 +3,18 @@
 #include <vector>
 #include "Utils.hpp"
 
+enum class MovieParams {
+	ID,
+	NAME,
+	GENRE,
+	LENGTH,
+	DESCRIPTION,
+	RATING,
+	CAST,
+	ADDDATE,
+	AVAILABLE
+};
+
 class Movie {
 	int id;
 	std::string name;
@@ -43,6 +55,7 @@ public:
 	std::string getName();
 	std::string getDirector();
 	int getLength();
+	std::string getGenre();
 	std::string getDescription();
 	float getRating();
 	std::vector<std::string> getCast();

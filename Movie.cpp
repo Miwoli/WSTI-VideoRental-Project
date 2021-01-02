@@ -39,6 +39,9 @@ std::string Movie::getDirector() {
 int Movie::getLength() {
     return length;
 }
+std::string Movie::getGenre() {
+    return genre;
+}
 std::string Movie::getDescription() {
     return description;
 }
@@ -68,7 +71,7 @@ Movie Movie::vectorOfStringsToModel(std::vector<std::string> data) {
         std::stoi(data[4]),         // Length
         data[5],                    // Description
         std::stof(data[6]),         // Rating
-        Utils::split(data[7], ";"), // Cast
+        Utils::split(data[7], ","), // Cast
         data[8],                    // Date
         Utils::strToBool(data[9])   // Available
     );
@@ -107,7 +110,7 @@ void Movie::setCast(std::vector<std::string> newCast) {
 }
 
 void Movie::setAddDate(std::string newAddDate) {
-    addDate = newAddDate
+    addDate = newAddDate;
 }
 
 void Movie::setAvailable(bool newAvailable) {

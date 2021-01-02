@@ -21,7 +21,7 @@ std::vector<Movie> DB::selectMovies() {
 		while (openedDB.good()) {
 			std::string row;
 			std::getline(openedDB, row);
-			movies.push_back(Movie::vectorOfStringsToModel(Utils::split(row, ",")));
+			movies.push_back(Movie::vectorOfStringsToModel(Utils::split(row, ";")));
 		}
 		
 		disconnect();
