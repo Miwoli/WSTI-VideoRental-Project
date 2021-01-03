@@ -27,6 +27,7 @@ class Movie {
 	std::string addDate;
 	bool available;
 
+public:
 	Movie(
 		int newId,
 		std::string newName,
@@ -39,7 +40,6 @@ class Movie {
 		std::string addDate,
 		bool newAvailable
 	);
-	void setId(int newId);
 	void setName(std::string newName);
 	void setGenre(std::string newGenre);
 	void setDirector(std::string newDirector);
@@ -49,8 +49,7 @@ class Movie {
 	void setCast(std::vector<std::string> newCast);
 	void setAddDate(std::string newAddDate);
 	void setAvailable(bool newAvailable);
-
-public:
+	void setId(int newId);
 	int getId();
 	std::string getName();
 	std::string getDirector();
@@ -62,4 +61,5 @@ public:
 	std::string getAddDate();
 	bool getAvailable();
 	Movie static vectorOfStringsToModel(std::vector<std::string>);
+	std::string modelToString();
 };

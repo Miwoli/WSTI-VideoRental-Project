@@ -33,3 +33,18 @@ std::vector<Movie> DB::selectMovies() {
 	return std::vector<Movie>();
 }
 
+void DB::createMovie(Movie movie) {
+	std::cout << "AAA";
+	std::cout << selectMovies().back();
+	//int lastIndex = selectMovies().back().getId();
+	/*connect("movies");
+	if (openedDB.is_open()) {
+		movie.setId(++lastIndex);
+		openedDB << movie.modelToString() << std::endl;
+
+		disconnect();
+	} else {
+		throw "Failed opening the file";
+	}*/
+}
+

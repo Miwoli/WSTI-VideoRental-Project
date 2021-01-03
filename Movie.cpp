@@ -77,6 +77,19 @@ Movie Movie::vectorOfStringsToModel(std::vector<std::string> data) {
     );
 }
 
+std::string Movie::modelToString() {
+    return std::to_string(getId()) + ';'
+        + getName() + ';'
+        + getGenre() + ';'
+        + getDirector() + ';'
+        + std::to_string(getLength()) + ';'
+        + getDescription() + ';'
+        + std::to_string(getRating()) + ';'
+        + Utils::implode(getCast(), ',') + ';'
+        + getAddDate() + ';'
+        + Utils::boolToStr(getAvailable());
+}
+
 void Movie::setId(int newId) {
     id = newId;
 }

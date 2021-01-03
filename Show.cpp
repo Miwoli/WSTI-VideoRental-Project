@@ -216,12 +216,15 @@ void Show::allMovies(SortOrder order, MovieParams param) {
 	}
 
 	for (auto movie : movies) {
+		std::string isAvailable = movie.getAvailable() ? "Available" : "Not available";
 		std::cout << movie.getId() << ") "
 			<< movie.getName() << " | "
 			<< movie.getDirector() << " | "
 			<< movie.getLength() << "min. | "
 			<< movie.getGenre() << " | "
-			<< movie.getAddDate()
+			<< movie.getRating() << " | "
+			<< movie.getAddDate() << " | "
+			<< isAvailable
 			<< std::endl;
 	}
 

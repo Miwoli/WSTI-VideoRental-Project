@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <fstream>
+#include <iostream>
 #include "Movie.hpp"
 #include "Utils.hpp"
 
@@ -13,6 +14,6 @@ class DB {
 public:
 	static DB& getDB();
 	std::vector<Movie> selectMovies();
-	// void createMovie(Movie movie);
+	void createMovie(Movie movie);
 };
 

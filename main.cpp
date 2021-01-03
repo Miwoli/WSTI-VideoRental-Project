@@ -8,6 +8,22 @@
 
 int main() {
 
+    Movie newMovie (
+        4,
+        "TestName",
+        "Action",
+        "Lorem Ipsum",
+        75,
+        "Lorem ipsum dolor sit amet",
+        4.6,
+        std::vector<std::string>{
+            std::string("George Clooney"),
+            std::string("Brad Pitt"),
+            std::string("Angelina Jolie")},
+        "20-05-2015",
+        false
+        );
+    DB::getDB().createMovie(newMovie);
     Show::mainMenu();
 
     std::cout << "Press any key to exit...";
