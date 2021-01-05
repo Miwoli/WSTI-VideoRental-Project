@@ -1,11 +1,17 @@
 #include "DB.hpp"
 
-void DB::connect(std::string tableName) {
-	openedDB.open(tableName + ".csv");
+void DB::connect(std::string tableName, bool read = false) {
+	if (!read) {
+		openedDB.open(tableName + ".csv");
+	} else {
+		openedDB.open(tableName + ".csv", std::fstream::app);
+	}
 }
 
 void DB::disconnect() {
 	openedDB.close();
+	openedDB.clear();
+	openedDB.seekg(0);
 }
 
 DB& DB::getDB() {
@@ -23,7 +29,6 @@ std::vector<Movie> DB::selectMovies() {
 			std::getline(openedDB, row);
 			movies.push_back(Movie::vectorOfStringsToModel(Utils::split(row, ";")));
 		}
-		
 		disconnect();
 		return movies;
 	} else {
@@ -34,17 +39,16 @@ std::vector<Movie> DB::selectMovies() {
 }
 
 void DB::createMovie(Movie movie) {
-	std::cout << "AAA";
-	std::cout << selectMovies().back();
-	//int lastIndex = selectMovies().back().getId();
-	/*connect("movies");
+	std::cout << selectMovies().back().getId();
+	int lastIndex = selectMovies().back().getId();
+	connect("movies", true);
 	if (openedDB.is_open()) {
 		movie.setId(++lastIndex);
-		openedDB << movie.modelToString() << std::endl;
+		openedDB << std::endl << movie.modelToString();
 
 		disconnect();
 	} else {
 		throw "Failed opening the file";
-	}*/
+	}
 }
 

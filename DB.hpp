@@ -8,7 +8,7 @@
 class DB {
 	std::fstream openedDB;
 	std::vector<Movie> movies;
-	void connect(std::string tableName);
+	void connect(std::string tableName, bool read);
 	void disconnect();
 
 public:

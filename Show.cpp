@@ -41,11 +41,21 @@ bool Show::sortByRatingDesc(Movie lhs, Movie rhs) {
 }
 
 bool Show::sortByAddDateAsc(Movie lhs, Movie rhs) {
-	return lhs.getAddDate() < rhs.getAddDate();
+	std::vector<std::string> lhsVec = Utils::split(lhs.getAddDate(), "-");
+	std::vector<std::string> rhsVec = Utils::split(rhs.getAddDate(), "-");
+
+	if (std::stoi(lhsVec[2]) != std::stoi(rhsVec[2])) return std::stoi(lhsVec[2]) < std::stoi(rhsVec[2]);
+	if (std::stoi(lhsVec[1]) != std::stoi(rhsVec[1])) return std::stoi(lhsVec[1]) < std::stoi(rhsVec[1]);
+	return std::stoi(lhsVec[0]) < std::stoi(rhsVec[0]);
 }
 
 bool Show::sortByAddDateDesc(Movie lhs, Movie rhs) {
-	return lhs.getAddDate() > rhs.getAddDate();
+	std::vector<std::string> lhsVec = Utils::split(lhs.getAddDate(), "-");
+	std::vector<std::string> rhsVec = Utils::split(rhs.getAddDate(), "-");
+
+	if (std::stoi(lhsVec[2]) != std::stoi(rhsVec[2])) return std::stoi(lhsVec[2]) > std::stoi(rhsVec[2]);
+	if (std::stoi(lhsVec[1]) != std::stoi(rhsVec[1])) return std::stoi(lhsVec[1]) > std::stoi(rhsVec[1]);
+	return std::stoi(lhsVec[0]) > std::stoi(rhsVec[0]);
 }
 
 bool Show::sortByAvailableAsc(Movie lhs, Movie rhs) {
