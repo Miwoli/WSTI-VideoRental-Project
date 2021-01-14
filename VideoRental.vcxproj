@@ -121,6 +121,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\wolin\OneDrive\WSTI\Sem 3\Lab\Programowanie Obiektowe\Projekt\libs\OpenSSL\1.1.1i\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -140,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Auth.cpp" />
     <ClCompile Include="DB.cpp" />
     <ClCompile Include="Movie.cpp" />
     <ClCompile Include="Rent.cpp" />
@@ -149,6 +151,7 @@
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Auth.hpp" />
     <ClInclude Include="DB.hpp" />
     <ClInclude Include="Movie.hpp" />
     <ClInclude Include="Rent.hpp" />
@@ -159,6 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="movies.csv" />
+    <None Include="users.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

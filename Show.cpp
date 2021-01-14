@@ -76,6 +76,8 @@ void Show::mainMenu() {
 			<< "1) Show all movies" << std::endl
 			<< "2) Exit" << std::endl;
 
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		std::cin >> input;
 
 		switch (input) {
@@ -102,6 +104,8 @@ void Show::mainMenu() {
 						<< "1) Ascending" << std::endl
 						<< "2) Descending" << std::endl;
 
+					std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+					std::cin.clear();
 					std::cin >> orderInput;
 					if (orderInput != 1 && orderInput != 2) {
 						correctInput = false;
@@ -110,7 +114,7 @@ void Show::mainMenu() {
 						if (orderInput == 2) sortOrder = SortOrder::DESC;
 						correctInput = true;
 					}
-				} while (!correctInput);
+				} while (!correctInput && !std::cin);
 
 				do {
 					std::cout << std::endl << std::endl << "Select sort param:" << std::endl
@@ -122,6 +126,8 @@ void Show::mainMenu() {
 						<< "6) Add Date" << std::endl
 						<< "7) Availibility" << std::endl;
 					
+					std::cin.clear();
+					std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 					std::cin >> paramInput;
 					correctInput = true;
 					
@@ -151,7 +157,7 @@ void Show::mainMenu() {
 						correctInput = false;
 						break;
 					}
-				} while (!correctInput);
+				} while (!correctInput || !std::cin);
 				allMovies(sortOrder, sortParam);
 			}
 
@@ -160,7 +166,66 @@ void Show::mainMenu() {
 			break;
 		}
 
-	} while (input != 2);
+	} while (input != 2 || !std::cin);
+}
+
+void Show::movieDetails(int id) {
+	Movie movie = DB::getDB().getMovie(id);
+	std::string isAvailable = movie.getAvailable() ? "Available" : "Not available";
+
+	std::cout << movie.getName() << std::endl << std::endl
+		<< "Rate: " << movie.getRating() << " | " << movie.getLength() << "min. | " << isAvailable << std::endl << std::endl
+		<< "Cast: " << Utils::implode(movie.getCast(), ", ") << std::endl << std::endl
+		<< movie.getDescription() << std::endl << std::endl
+		<< "Available since: " << movie.getAddDate() << std::endl << std::endl;
+}
+
+void Show::addMovie() {
+	Movie movie = Movie();
+
+	std::string text;
+	int intiger;
+	float decimal;
+
+	std::cout << "Name: ";
+	std::getline(std::cin >> std::ws, text);
+	movie.setName(text);
+	std::cout << std::endl;
+
+	std::cout << "Genre: ";
+	std::getline(std::cin >> std::ws, text);
+	movie.setGenre(text);
+	std::cout << std::endl;
+
+	std::cout << "Direcotr: ";
+	std::getline(std::cin >> std::ws, text);
+	movie.setDirector(text);
+	std::cout << std::endl;
+
+	std::cout << "Length: ";
+	std::cin >> intiger;
+	movie.setLength(intiger);
+	std::cout << std::endl;
+
+	std::cout << "Description: ";
+	std::getline(std::cin >> std::ws, text);
+	movie.setDescription(text);
+	std::cout << std::endl;
+
+	std::cout << "Rating (1-5, decimals with .): "; // TODO: Create class validator, validate inputs
+	std::cin >> decimal;
+	movie.setRating(decimal);
+	std::cout << std::endl;
+
+	std::cout << "Cast (separated with comma, with no spaces around commas): " << std::endl;
+	std::getline(std::cin >> std::ws, text);
+	movie.setCast(Utils::split(text, ","));
+	std::cout << std::endl;
+
+	movie.setAddDate(Utils::nowAsString());
+	movie.setAvailable(true);
+
+	DB::getDB().createMovie(movie);
 }
 
 void Show::allMovies(SortOrder order, MovieParams param) {
@@ -238,6 +303,26 @@ void Show::allMovies(SortOrder order, MovieParams param) {
 			<< std::endl;
 	}
 
-	std::cout << "Press any key to continue..." << std::endl;
-	std::getchar();
+	char seeDetails;
+	do {
+		std::cout << "Do you want to see more details [y/n]" << std::endl;
+		std::cin >> seeDetails;
+	} while (seeDetails != 'Y' && seeDetails != 'y' && seeDetails != 'N' && seeDetails != 'n');
+
+	if (seeDetails == 'Y' || seeDetails == 'y') {
+
+		int moviesAmount = movies.size();
+		int movieId;
+
+		do {
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			std::cout << "Type movie ID you wish to see details: ";
+			std::cin >> movieId;
+
+			if ((movieId > moviesAmount) || !std::cin) std::cout << "There's no movie with that ID" << std::endl;
+		} while ((movieId > moviesAmount) || !std::cin);
+
+		movieDetails(movieId);
+	}
 }

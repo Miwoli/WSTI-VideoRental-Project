@@ -24,6 +24,19 @@ Movie::Movie(
     setAvailable(newAvailable);
 }
 
+Movie::Movie() {
+    setId(0);
+    setName("");
+    setGenre("");
+    setDirector("");
+    setLength(0);
+    setDescription("");
+    setRating(0);
+    setCast({""});
+    setAddDate("");
+    setAvailable(false);
+}
+
 int Movie::getId() {
     return id;
 }
@@ -85,7 +98,7 @@ std::string Movie::modelToString() {
         + std::to_string(getLength()) + ';'
         + getDescription() + ';'
         + std::to_string(getRating()) + ';'
-        + Utils::implode(getCast(), ',') + ';'
+        + Utils::implode(getCast(), ",") + ';'
         + getAddDate() + ';'
         + Utils::boolToStr(getAvailable());
 }

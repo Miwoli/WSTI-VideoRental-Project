@@ -30,5 +30,7 @@ class Show {
 public:
 	static void mainMenu();
 	static void allMovies(SortOrder order = SortOrder::ASC, MovieParams param = MovieParams::ID);
+	static void movieDetails(int id);
+	static void addMovie();
 };
 

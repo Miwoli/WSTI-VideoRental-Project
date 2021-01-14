@@ -5,26 +5,50 @@
 #include "DB.hpp"
 #include "Movie.hpp"
 #include "Show.hpp"
+#include "Utils.hpp"
+#include "Auth.hpp"
 
 int main() {
 
-    Movie newMovie (
-        4,
-        "TestName",
-        "Action",
-        "Lorem Ipsum",
-        75,
-        "Lorem ipsum dolor sit amet",
-        4.6,
-        std::vector<std::string>{
-            std::string("George Clooney"),
-            std::string("Brad Pitt"),
-            std::string("Angelina Jolie")},
-        "20-05-2015",
+    //Show::addMovie();
+    //Show::mainMenu();
+
+    User user1 = User(
+        2,
+        "user1",
+        "User",
+        "Userson",
+        "123456789",
+        "Lorem ipsum street",
+        Utils::nowAsString(),
+        true
+    );
+
+    User user2 = User(
+        3,
+        "user2",
+        "User",
+        "Userson",
+        "123456789",
+        "Lorem ipsum street",
+        Utils::nowAsString(),
         false
-        );
-    DB::getDB().createMovie(newMovie);
-    Show::mainMenu();
+    );
+
+    User user3 = User(
+        4,
+        "user1",
+        "User",
+        "Userson",
+        "123456789",
+        "Lorem ipsum street",
+        Utils::nowAsString(),
+        false
+    );
+
+    Auth::registerUser(user1, "12345");
+    Auth::registerUser(user2, "12345");
+    Auth::registerUser(user3, "12345");
 
     std::cout << "Press any key to exit...";
     std::getchar();

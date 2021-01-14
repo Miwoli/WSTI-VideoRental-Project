@@ -28,6 +28,7 @@ class Movie {
 	bool available;
 
 public:
+	Movie();
 	Movie(
 		int newId,
 		std::string newName,
@@ -40,6 +41,7 @@ public:
 		std::string addDate,
 		bool newAvailable
 	);
+	void setId(int newId);
 	void setName(std::string newName);
 	void setGenre(std::string newGenre);
 	void setDirector(std::string newDirector);
@@ -49,7 +51,6 @@ public:
 	void setCast(std::vector<std::string> newCast);
 	void setAddDate(std::string newAddDate);
 	void setAvailable(bool newAvailable);
-	void setId(int newId);
 	int getId();
 	std::string getName();
 	std::string getDirector();
