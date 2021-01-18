@@ -5,6 +5,11 @@ std::vector<User> DB::selectUsers() {
 	if (openedDB.is_open()) {
 		std::vector<User> users;
 
+		if (Utils::isEmptyFile(openedDB)) {
+			disconnect();
+			return users;
+		};
+
 		while (openedDB.good()) {
 			std::string row;
 			std::getline(openedDB, row);
@@ -19,8 +24,8 @@ std::vector<User> DB::selectUsers() {
 	return std::vector<User>();
 }
 
-void DB::connect(std::string tableName, bool read = false) {
-	if (!read) {
+void DB::connect(std::string tableName, bool write = false) {
+	if (!write) {
 		openedDB.open(tableName + ".csv");
 	} else {
 		openedDB.open(tableName + ".csv", std::fstream::app);
@@ -29,8 +34,8 @@ void DB::connect(std::string tableName, bool read = false) {
 
 void DB::disconnect() {
 	openedDB.close();
-	openedDB.clear();
 	openedDB.seekg(0);
+	openedDB.clear();
 }
 
 DB& DB::getDB() {
@@ -86,15 +91,17 @@ void DB::createMovie(Movie movie) {
 }
 
 void DB::createUser(User user, std::string passwordHash, std::string salt) {
-	int lastIndex = selectUsers().back().getId();
+	int lastIndex = selectUsers().empty() ? 0 : selectUsers().back().getId();
 	connect("users", true);
 	if (openedDB.is_open()) {
+		if (lastIndex != 0) {
+			openedDB << std::endl;
+		}
 		user.setId(++lastIndex);
-		openedDB << std::endl << user.modelToString() << ";" << passwordHash << ";" << salt;
+		openedDB << user.modelToString() << ";" << passwordHash << ";" << salt;
 
 		disconnect();
 	} else {
 		throw "Failed opening the file";
 	}
 }
-

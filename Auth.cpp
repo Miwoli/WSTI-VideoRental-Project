@@ -15,7 +15,6 @@ std::string Auth::sha256(std::string str) {
 }
 
 std::string Auth::generateSalt(int length) {
-    // TODO: Salt is simetimes generating wierd ? symbol (like encoding error). To investigate
     static const char alphanum[] =
         "0123456789"
         "!@#$%^&*"
@@ -46,7 +45,12 @@ bool Auth::registerUser(User newUser, std::string password) {
     std::string salt = generateSalt(32);
     std::string hash = generateHash(password, salt);
 
-    DB::getDB().createUser(newUser, hash, salt);
+    try {
+        DB::getDB().createUser(newUser, hash, salt);
+    } catch (const std::exception& e) {
+        std::cout << e.what() << std::endl;
+    }
+
 
     return true;
 }

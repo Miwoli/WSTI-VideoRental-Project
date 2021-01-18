@@ -45,3 +45,7 @@ std::string Utils::nowAsString() {
 
     return std::to_string(day) + "-" + (month < 10 ? ("0" + std::to_string(month)) : std::to_string(month)) + "-" + std::to_string(year);
 }
+
+bool Utils::isEmptyFile(std::fstream& file) {
+    return file.peek() == std::fstream::traits_type::eof();
+}

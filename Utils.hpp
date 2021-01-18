@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <fstream>
 #include <sstream>
 #include <vector>
 #include <ctime>
@@ -11,5 +12,6 @@ public:
 	static std::string boolToStr(bool value);
 	static std::string implode(std::vector<std::string> vector, std::string delimiter);
 	static std::string nowAsString();
+	static bool isEmptyFile(std::fstream& file);
 };
 
