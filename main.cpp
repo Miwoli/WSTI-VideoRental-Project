@@ -50,6 +50,30 @@ int main() {
     Auth::registerUser(user2, "12345");
     Auth::registerUser(user3, "12345");
 
+    std::string login;
+    std::cout << "Login: ";
+    std::cin >> login;
+
+    std::string password;
+    std::cout << "Password: ";
+    std::cin >> password;
+
+    Auth::login(login, password);
+
+    if (Auth::getLoggedUser()) {
+        std::cout << Auth::getLoggedUser().value().getFirstName() << std::endl;
+    } else {
+        std::cout << "No logged user" << std::endl;
+    }
+
+    Auth::logout();
+
+    if (Auth::getLoggedUser()) {
+        std::cout << Auth::getLoggedUser().value().getFirstName() << std::endl;
+    } else {
+        std::cout << "No logged user" << std::endl;
+    }
+
     std::cout << "Press any key to exit...";
     std::getchar();
 }

@@ -1,5 +1,6 @@
 #include "Auth.hpp"
 
+std::optional<User> Auth::loggedUser;
 
 std::string Auth::sha256(std::string str) {
     unsigned char hash[SHA256_DIGEST_LENGTH];
@@ -39,6 +40,32 @@ std::string Auth::generateHash(std::string password, std::string salt) {
     return sha256(password + salt);
 }
 
+std::optional<User> Auth::getLoggedUser() {
+    return Auth::loggedUser;
+}
+
+void Auth::login(std::string login, std::string password) {
+    if (!DB::getDB().getUser(login)) {
+        std::cout << "Incorrect *login* or password" << std::endl; // TODO: Extract error to Show/Validator/Error class, remove hint, what is incorrect
+        return;
+    }
+
+    User user = DB::getDB().getUser(login).value();
+    std::vector<std::string> authData = DB::getDB().getAuthData(login).value();
+
+    if (generateHash(password, authData[1]) == authData[0]) {
+        Auth::loggedUser = user;
+        std::cout << "Logged in succesfully!" << std::endl;
+    } else {
+        std::cout << "Incorrect login or *password*" << std::endl; // TODO: Extract error to Show/Validator/Error class, remove hint, what is incorrect
+        return;
+    }
+}
+
+void Auth::logout() {
+    Auth::loggedUser = std::nullopt;
+}
+
 bool Auth::registerUser(User newUser, std::string password) {
     if (DB::getDB().getUser(newUser.getLogin())) return false; //TODO: Move validation if user exist to Validator class
 
@@ -50,7 +77,6 @@ bool Auth::registerUser(User newUser, std::string password) {
     } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
     }
-
 
     return true;
 }

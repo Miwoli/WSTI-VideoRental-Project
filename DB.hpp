@@ -2,7 +2,7 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
-#include <boost/optional.hpp>
+#include <optional>
 #include "Movie.hpp"
 #include "User.hpp"
 #include "Utils.hpp"
@@ -19,7 +19,8 @@ public:
 	static DB& getDB();
 	std::vector<Movie> selectMovies();
 	Movie getMovie(int id);
-	boost::optional<User> getUser(std::string login);
+	std::optional<User> getUser(std::string login);
+	std::optional<std::vector<std::string>> getAuthData(std::string login);
 	void createMovie(Movie movie);
 	void createUser(User user, std::string passwordHash, std::string salt);
 };

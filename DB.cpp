@@ -69,12 +69,42 @@ Movie DB::getMovie(int id) {
 	return *it;
 }
 
-boost::optional<User> DB::getUser(std::string login) {
+std::optional<User> DB::getUser(std::string login) {
 	std::vector<User> users = DB::getDB().selectUsers();
-	auto it = std::find_if(users.begin(), users.end(), [&login](User obj) {return obj.getLogin() == login;  });
+	auto it = std::find_if(users.begin(), users.end(), [&login](User obj) {return obj.getLogin() == login;});
 
-	if (it == users.end()) return boost::none;
+	if (it == users.end()) return std::nullopt;
 	return *it;
+}
+
+std::optional<std::vector<std::string>> DB::getAuthData(std::string login) {
+	if (!getUser(login)) {
+		return std::nullopt;
+	}
+
+	int id = getUser(login).value().getId();
+
+	connect("users");
+
+	std::vector<std::string> result;
+	std::string line;
+
+	if (openedDB.is_open()) {
+		for (int i = 1; std::getline(openedDB, line) && i <= id; i++) {
+			if (i == id) {
+				std::vector<std::string> temp = Utils::split(line, ";");
+				result.push_back(temp.end()[-2]); // hash
+				result.push_back(temp.end()[-1]); // salt
+			}
+		}
+
+		disconnect();
+		return result;
+	} else {
+		throw "Failed opening the file";
+	}
+
+	return std::nullopt;
 }
 
 void DB::createMovie(Movie movie) {
