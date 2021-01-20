@@ -18,8 +18,8 @@ class Auth {
 
 public:
 	static std::optional<User> getLoggedUser();
-	static void login(std::string login, std::string password);
+	static bool login(std::string login, std::string password);
 	static void logout();
-	static bool registerUser(User newUser, std::string password);
+	static void registerUser(User newUser, std::string password);
 };
 

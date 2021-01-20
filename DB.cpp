@@ -135,3 +135,13 @@ void DB::createUser(User user, std::string passwordHash, std::string salt) {
 		throw "Failed opening the file";
 	}
 }
+
+bool DB::areAnyUsers() {
+	connect("users");
+	if (Utils::isEmptyFile(openedDB)) {
+		disconnect();
+		return false;
+	}
+	disconnect();
+	return true;
+}

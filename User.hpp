@@ -12,7 +12,6 @@ class User {
 	std::string phone;
 	std::string address;
 	std::string registerDate;
-	void setIsAdmin(bool newIsAdmin);
 
 public:
 	User();
@@ -33,6 +32,7 @@ public:
 	void setPhone(std::string newPhone);
 	void setAddress(std::string newAddress);
 	void setRegisterDate(std::string newRegisterDate);
+	void setIsAdmin(bool newIsAdmin);
 	int getId();
 	std::string getLogin();
 	std::string getFirstName();

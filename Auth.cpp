@@ -44,10 +44,9 @@ std::optional<User> Auth::getLoggedUser() {
     return Auth::loggedUser;
 }
 
-void Auth::login(std::string login, std::string password) {
+bool Auth::login(std::string login, std::string password) {
     if (!DB::getDB().getUser(login)) {
-        std::cout << "Incorrect *login* or password" << std::endl; // TODO: Extract error to Show/Validator/Error class, remove hint, what is incorrect
-        return;
+        return false;
     }
 
     User user = DB::getDB().getUser(login).value();
@@ -55,20 +54,18 @@ void Auth::login(std::string login, std::string password) {
 
     if (generateHash(password, authData[1]) == authData[0]) {
         Auth::loggedUser = user;
-        std::cout << "Logged in succesfully!" << std::endl;
     } else {
-        std::cout << "Incorrect login or *password*" << std::endl; // TODO: Extract error to Show/Validator/Error class, remove hint, what is incorrect
-        return;
+        return false;
     }
+
+    return true;
 }
 
 void Auth::logout() {
     Auth::loggedUser = std::nullopt;
 }
 
-bool Auth::registerUser(User newUser, std::string password) {
-    if (DB::getDB().getUser(newUser.getLogin())) return false; //TODO: Move validation if user exist to Validator class
-
+void Auth::registerUser(User newUser, std::string password) {
     std::string salt = generateSalt(32);
     std::string hash = generateHash(password, salt);
 
@@ -77,6 +74,4 @@ bool Auth::registerUser(User newUser, std::string password) {
     } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
     }
-
-    return true;
 }

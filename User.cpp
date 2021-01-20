@@ -39,7 +39,7 @@ User::User() {
 	setLastName("");
 	setPhone("");
 	setAddress("");
-	setRegisterDate("");
+	setRegisterDate(Utils::nowAsString());
 	setIsAdmin(false);
 }
 

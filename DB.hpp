@@ -23,5 +23,6 @@ public:
 	std::optional<std::vector<std::string>> getAuthData(std::string login);
 	void createMovie(Movie movie);
 	void createUser(User user, std::string passwordHash, std::string salt);
+	bool areAnyUsers();
 };
 

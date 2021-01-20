@@ -26,6 +26,12 @@ class Show {
 	static bool sortByAddDateDesc(Movie lhs, Movie rhs);
 	static bool sortByAvailableAsc(Movie lhs, Movie rhs);
 	static bool sortByAvailableDesc(Movie lhs, Movie rhs);
+	static void registerUser();
+	static void loginUser();
+	static void rentMovie();
+	static void menuAllMovies();
+	static void menuLoginLogout();
+	static void menuRentRegister();
 
 public:
 	static void mainMenu();
