@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <ctime>
+#include <boost/date_time.hpp>
 
 class Utils {
 public:
@@ -11,7 +12,7 @@ public:
 	static bool strToBool(std::string str);
 	static std::string boolToStr(bool value);
 	static std::string implode(std::vector<std::string> vector, std::string delimiter);
-	static std::string nowAsString();
+	static std::string dateAsString(int dayOffset = 0);
 	static bool isEmptyFile(std::fstream& file);
 };
 

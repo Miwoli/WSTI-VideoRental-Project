@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClCompile Include="Auth.cpp" />
     <ClCompile Include="DB.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="Movie.cpp" />
     <ClCompile Include="Rent.cpp" />
     <ClCompile Include="main.cpp" />
@@ -154,15 +155,18 @@
   <ItemGroup>
     <ClInclude Include="Auth.hpp" />
     <ClInclude Include="DB.hpp" />
+    <ClInclude Include="Model.hpp" />
     <ClInclude Include="Movie.hpp" />
     <ClInclude Include="Rent.hpp" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="Show.hpp" />
     <ClInclude Include="User.hpp" />
     <ClInclude Include="Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="movies.csv" />
+    <None Include="rents.csv" />
     <None Include="users.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

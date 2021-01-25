@@ -1,9 +1,10 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "Model.hpp"
 #include "Utils.hpp"
 
-class User {
+class User: public Model {
 	int id;
 	std::string login;
 	std::string firstName;
@@ -25,14 +26,14 @@ public:
 		std::string newRegisterDate,
 		bool newIsAdmin
 	);
-	void setId(int newId);
-	void setLogin(std::string newLogin);
-	void setFirstName(std::string newFirstName);
-	void setLastName(std::string newLastName);
-	void setPhone(std::string newPhone);
-	void setAddress(std::string newAddress);
-	void setRegisterDate(std::string newRegisterDate);
-	void setIsAdmin(bool newIsAdmin);
+	void setId(int);
+	void setLogin(std::string);
+	void setFirstName(std::string);
+	void setLastName(std::string);
+	void setPhone(std::string);
+	void setAddress(std::string);
+	void setRegisterDate(std::string);
+	void setIsAdmin(bool);
 	int getId();
 	std::string getLogin();
 	std::string getFirstName();

@@ -39,6 +39,9 @@
     <ClCompile Include="Auth.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Movie.hpp">
@@ -65,12 +68,21 @@
     <ClInclude Include="Auth.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="movies.csv">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="users.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="rents.csv">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

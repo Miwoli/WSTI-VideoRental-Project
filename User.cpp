@@ -24,10 +24,6 @@ std::string User::modelToString() {
 		+ Utils::boolToStr(getIsAdmin());
 }
 
-void User::setId(int newId) {
-	id = newId;
-}
-
 void User::setIsAdmin(bool newIsAdmin) {
 	isAdmin = newIsAdmin;
 }
@@ -39,7 +35,7 @@ User::User() {
 	setLastName("");
 	setPhone("");
 	setAddress("");
-	setRegisterDate(Utils::nowAsString());
+	setRegisterDate(Utils::dateAsString());
 	setIsAdmin(false);
 }
 
@@ -61,6 +57,10 @@ User::User(
 	setAddress(newAddress);
 	setRegisterDate(newRegisterDate);
 	setIsAdmin(newIsAdmin);
+}
+
+void User::setId(int newId) {
+	id = newId;
 }
 
 void User::setLogin(std::string newLogin) {

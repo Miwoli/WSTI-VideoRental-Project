@@ -48,6 +48,11 @@ std::vector<Movie> DB::selectMovies() {
 	if (openedDB.is_open()) {
 		std::vector<Movie> movies;
 
+		if (Utils::isEmptyFile(openedDB)) {
+			disconnect();
+			return movies;
+		}
+
 		while (openedDB.good()) {
 			std::string row;
 			std::getline(openedDB, row);
@@ -62,18 +67,60 @@ std::vector<Movie> DB::selectMovies() {
 	return std::vector<Movie>();
 }
 
-Movie DB::getMovie(int id) {
-	std::vector<Movie> movies = DB::getDB().selectMovies();
-	auto it = std::find_if(movies.begin(), movies.end(), [&id](Movie obj) {return obj.getId() == id; });
+std::vector<Rent> DB::selectRents() {
+	connect("rents");
+	if (openedDB.is_open()) {
+		std::vector<Rent> rents;
 
+		if (Utils::isEmptyFile(openedDB)) {
+			disconnect();
+			return rents;
+		}
+
+		while (openedDB.good()) {
+			std::string row;
+			std::getline(openedDB, row);
+			rents.push_back(Rent::vectorOfStringsToModel(Utils::split(row, ";")));
+		}
+		disconnect();
+		return rents;
+	} else {
+		throw "Failed opening the file";
+	}
+
+	return std::vector<Rent>();
+}
+
+std::vector<Rent> DB::selectUserRents(std::string login) {
+	std::vector<Rent> allRents = DB::getDB().selectRents();
+	std::vector<Rent> userRents;
+
+	std::copy_if(allRents.begin(), allRents.end(), std::back_inserter(userRents), [&login](Rent obj) { return obj.getUserLogin() == login; });
+
+	return userRents;
+}
+
+std::optional<Movie> DB::getMovie(int id) {
+	std::vector<Movie> movies = DB::getDB().selectMovies();
+	auto it = std::find_if(movies.begin(), movies.end(), [&id](Movie obj) { return obj.getId() == id; });
+
+	if (it == movies.end()) return std::nullopt;
 	return *it;
 }
 
 std::optional<User> DB::getUser(std::string login) {
 	std::vector<User> users = DB::getDB().selectUsers();
-	auto it = std::find_if(users.begin(), users.end(), [&login](User obj) {return obj.getLogin() == login;});
+	auto it = std::find_if(users.begin(), users.end(), [&login](User obj) { return obj.getLogin() == login; });
 
 	if (it == users.end()) return std::nullopt;
+	return *it;
+}
+
+std::optional<Rent> DB::getRent(int id) {
+	std::vector<Rent> rents = DB::getDB().selectRents();
+	auto it = std::find_if(rents.begin(), rents.end(), [&id](Rent obj) { return obj.getId() == id; });
+
+	if (it == rents.end()) return std::nullopt;
 	return *it;
 }
 
@@ -108,11 +155,14 @@ std::optional<std::vector<std::string>> DB::getAuthData(std::string login) {
 }
 
 void DB::createMovie(Movie movie) {
-	int lastIndex = selectMovies().back().getId();
+	int lastIndex = selectMovies().empty() ? 0 : selectMovies().back().getId();
 	connect("movies", true);
 	if (openedDB.is_open()) {
+		if (lastIndex != 0) {
+			openedDB << std::endl;
+		}
 		movie.setId(++lastIndex);
-		openedDB << std::endl << movie.modelToString();
+		openedDB << movie.modelToString();
 
 		disconnect();
 	} else {
@@ -134,6 +184,38 @@ void DB::createUser(User user, std::string passwordHash, std::string salt) {
 	} else {
 		throw "Failed opening the file";
 	}
+}
+
+void DB::createRent(Rent rent) {
+	int lastIndex = selectRents().empty() ? 0 : selectRents().back().getId();
+	connect("rents", true);
+	if (openedDB.is_open()) {
+		if (lastIndex != 0) {
+			openedDB << std::endl;
+		}
+		rent.setId(++lastIndex);
+		openedDB << rent.modelToString();
+
+		disconnect();
+	} else {
+		throw "Failed opening the file";
+	}
+}
+
+void DB::updateMovie(Movie updated) {
+	std::vector<Movie> allMovies = selectMovies();
+
+	allMovies[updated.getId() - 1] = updated;
+	openedDB.open("movies.csv", std::fstream::trunc);
+	int index = 0;
+
+	for (auto movie : allMovies) {
+		if (index != 0) {
+			openedDB << std::endl;
+		}
+		openedDB << movie.modelToString();
+	}
+	disconnect();
 }
 
 bool DB::areAnyUsers() {

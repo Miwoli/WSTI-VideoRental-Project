@@ -75,3 +75,8 @@ void Auth::registerUser(User newUser, std::string password) {
         std::cout << e.what() << std::endl;
     }
 }
+
+bool Auth::isLoggedInAdmin() {
+    if (loggedUser && loggedUser.value().getIsAdmin()) return true;
+    return false;
+}

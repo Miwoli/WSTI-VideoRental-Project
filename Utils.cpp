@@ -35,15 +35,17 @@ std::string Utils::implode(std::vector<std::string> vector, std::string delimite
     return result;
 }
 
-std::string Utils::nowAsString() {
-    struct tm newtime;
-    time_t now = time(0);
-    localtime_s(&newtime, &now);
-    int day = newtime.tm_mday;
-    int month = 1 + newtime.tm_mon;
-    int year = 1900 + newtime.tm_year;
+std::string Utils::dateAsString(int dayOffset) {
+    boost::posix_time::ptime timelocal = boost::posix_time::second_clock::local_time();
+    boost::gregorian::date dateObj = timelocal.date();
+    boost::posix_time::time_duration timeDuration = timelocal.time_of_day();
 
-    return std::to_string(day) + "-" + (month < 10 ? ("0" + std::to_string(month)) : std::to_string(month)) + "-" + std::to_string(year);
+    //boost::gregorian::date_duration offset(dayOffset);
+    boost::posix_time::ptime timeUTC = boost::posix_time::second_clock::universal_time();
+    boost::posix_time::hours offset(dayOffset * 24);
+
+    return boost::posix_time::to_iso_extended_string(timeUTC + offset);
+    //return  boost::gregorian::to_iso_extended_string(dateObj + offset);
 }
 
 bool Utils::isEmptyFile(std::fstream& file) {

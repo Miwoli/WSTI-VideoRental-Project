@@ -21,5 +21,5 @@ public:
 	static bool login(std::string login, std::string password);
 	static void logout();
 	static void registerUser(User newUser, std::string password);
+	static bool isLoggedInAdmin();
 };
-

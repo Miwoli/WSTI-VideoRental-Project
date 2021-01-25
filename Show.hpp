@@ -28,15 +28,19 @@ class Show {
 	static bool sortByAvailableDesc(Movie lhs, Movie rhs);
 	static void registerUser();
 	static void loginUser();
-	static void rentMovie();
+	static void rentMovie(User, Movie);
+	static void returnMovie(User);
 	static void menuAllMovies();
 	static void menuLoginLogout();
 	static void menuRentRegister();
+	static int mainDefaultMenu();
+	static int mainAdminMenu();
+	static void movieDetails(int id);
+	static void userRents(std::string login);
+	static void allMovies(SortOrder order = SortOrder::ASC, MovieParams param = MovieParams::ID);
+	static void addMovie();
 
 public:
 	static void mainMenu();
-	static void allMovies(SortOrder order = SortOrder::ASC, MovieParams param = MovieParams::ID);
-	static void movieDetails(int id);
-	static void addMovie();
 };
 

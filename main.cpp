@@ -7,59 +7,12 @@
 #include "Show.hpp"
 #include "Utils.hpp"
 #include "Auth.hpp"
+#include <boost/date_time.hpp>
 
 int main() {
 
-    //Show::addMovie();
     Show::mainMenu();
-
-    /*
-    User user1 = User(
-        2,
-        "user1",
-        "User",
-        "Userson",
-        "123456789",
-        "Lorem ipsum street",
-        Utils::nowAsString(),
-        true
-    );
-
-    User user2 = User(
-        3,
-        "user2",
-        "User",
-        "Userson",
-        "123456789",
-        "Lorem ipsum street",
-        Utils::nowAsString(),
-        false
-    );
-
-    User user3 = User(
-        4,
-        "user1",
-        "User",
-        "Userson",
-        "123456789",
-        "Lorem ipsum street",
-        Utils::nowAsString(),
-        false
-    );
-
-    Auth::registerUser(user1, "12345");
-    Auth::registerUser(user2, "12345");
-    Auth::registerUser(user3, "12345");
-
-    Auth::logout();
-
-    if (Auth::getLoggedUser()) {
-        std::cout << Auth::getLoggedUser().value().getFirstName() << std::endl;
-    } else {
-        std::cout << "No logged user" << std::endl;
-    }
-    */
-
+    
     std::cout << "Press any key to exit...";
     std::getchar();
 }

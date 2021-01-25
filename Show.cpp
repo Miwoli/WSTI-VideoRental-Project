@@ -41,21 +41,17 @@ bool Show::sortByRatingDesc(Movie lhs, Movie rhs) {
 }
 
 bool Show::sortByAddDateAsc(Movie lhs, Movie rhs) {
-	std::vector<std::string> lhsVec = Utils::split(lhs.getAddDate(), "-");
-	std::vector<std::string> rhsVec = Utils::split(rhs.getAddDate(), "-");
+	boost::posix_time::ptime lhsDate = boost::posix_time::from_iso_extended_string(lhs.getAddDate());
+	boost::posix_time::ptime rhsDate = boost::posix_time::from_iso_extended_string(rhs.getAddDate());
 
-	if (std::stoi(lhsVec[2]) != std::stoi(rhsVec[2])) return std::stoi(lhsVec[2]) < std::stoi(rhsVec[2]);
-	if (std::stoi(lhsVec[1]) != std::stoi(rhsVec[1])) return std::stoi(lhsVec[1]) < std::stoi(rhsVec[1]);
-	return std::stoi(lhsVec[0]) < std::stoi(rhsVec[0]);
+	return lhsDate < rhsDate;
 }
 
 bool Show::sortByAddDateDesc(Movie lhs, Movie rhs) {
-	std::vector<std::string> lhsVec = Utils::split(lhs.getAddDate(), "-");
-	std::vector<std::string> rhsVec = Utils::split(rhs.getAddDate(), "-");
+	boost::posix_time::ptime lhsDate = boost::posix_time::from_iso_extended_string(lhs.getAddDate());
+	boost::posix_time::ptime rhsDate = boost::posix_time::from_iso_extended_string(rhs.getAddDate());
 
-	if (std::stoi(lhsVec[2]) != std::stoi(rhsVec[2])) return std::stoi(lhsVec[2]) > std::stoi(rhsVec[2]);
-	if (std::stoi(lhsVec[1]) != std::stoi(rhsVec[1])) return std::stoi(lhsVec[1]) > std::stoi(rhsVec[1]);
-	return std::stoi(lhsVec[0]) > std::stoi(rhsVec[0]);
+	return lhsDate > rhsDate;
 }
 
 void Show::menuAllMovies() {
@@ -213,11 +209,29 @@ void Show::loginUser() {
 	}
 }
 
-void Show::rentMovie() {
+void Show::rentMovie(User user, Movie movie) {
+	char input;
+	do {
+		std::cin.clear();
+		std::cout << "Do you want to rent this movie [y/n]" << std::endl;
+		std::cin >> input;
+	} while (input != 'Y' && input != 'y' && input != 'N' && input != 'n');
+
+	if (input == 'y' || input == 'Y') {
+		Rent rent = Rent();
+		rent.setMovieId(movie.getId());
+		rent.setUserLogin(user.getLogin());
+		rent.setRentDate(Utils::dateAsString());
+		rent.setExpReturnDate(Utils::dateAsString(3));
+
+		movie.setAvailable(false);
+		DB::getDB().updateMovie(movie);
+		DB::getDB().createRent(rent);
+	}
 }
 
 void Show::menuRentRegister() {
-	Auth::getLoggedUser() ? rentMovie() : registerUser();
+	Auth::getLoggedUser() ? userRents(Auth::getLoggedUser().value().getLogin()) : registerUser();
 }
 
 void Show::menuLoginLogout() {
@@ -241,44 +255,21 @@ void Show::mainMenu() {
 
 	std::cout << "Welcome to Movie Rental Client. Created by: Michal 'Miwoli' Wolinski. All rights reserverd @2021"
 		<< std::endl << "Press any key to start..." << std::endl << std::endl;
-	int input;
+	int response;
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 	do {
-		std::cout << std::endl << "----- MOVIE RENTAL MAIN MENU -----" << std::endl;
-		if (Auth::getLoggedUser()) {
-			std::cout << "Welcome, " << Auth::getLoggedUser().value().getFirstName() << " " << Auth::getLoggedUser().value().getLastName() << "." << std::endl;
+		if (Auth::isLoggedInAdmin()) {
+			response = mainAdminMenu();
+		} else {
+			response = mainDefaultMenu();
 		}
-
-		std::cout << std::endl << "Select option:" << std::endl
-			<< "1) Show all movies" << std::endl
-			<< "2) " << (Auth::getLoggedUser() ? "Logout" : "Login") << std::endl
-			<< "3) " << (Auth::getLoggedUser() ? "Rent a movie" : "Register") << std::endl
-			<< "9) Exit" << std::endl;
-
-		std::cin.clear();
-		std::cin >> input;
-		std::cout << std::endl;
-
-		switch (input) {
-		case 1:
-			menuAllMovies();
-			break;
-		case 2:
-			menuLoginLogout();
-			break;
-		case 3:
-			menuRentRegister();
-			break;
-		default:
-			break;
-		}
-
-	} while (input != 9 || !std::cin);
+	} while (response != 9 || !std::cin);
 }
 
 void Show::movieDetails(int id) {
-	Movie movie = DB::getDB().getMovie(id);
+	if (!DB::getDB().getMovie(id)) return;
+	Movie movie = DB::getDB().getMovie(id).value();
 	std::string isAvailable = movie.getAvailable() ? "Available" : "Not available";
 
 	std::cout << movie.getName() << std::endl << std::endl
@@ -286,6 +277,10 @@ void Show::movieDetails(int id) {
 		<< "Cast: " << Utils::implode(movie.getCast(), ", ") << std::endl << std::endl
 		<< movie.getDescription() << std::endl << std::endl
 		<< "Available since: " << movie.getAddDate() << std::endl << std::endl;
+
+	if (Auth::getLoggedUser() && movie.getAvailable()) {
+		rentMovie(Auth::getLoggedUser().value(), movie);
+	}
 }
 
 void Show::addMovie() {
@@ -305,7 +300,7 @@ void Show::addMovie() {
 	movie.setGenre(text);
 	std::cout << std::endl;
 
-	std::cout << "Direcotr: ";
+	std::cout << "Director: ";
 	std::getline(std::cin >> std::ws, text);
 	movie.setDirector(text);
 	std::cout << std::endl;
@@ -330,10 +325,96 @@ void Show::addMovie() {
 	movie.setCast(Utils::split(text, ","));
 	std::cout << std::endl;
 
-	movie.setAddDate(Utils::nowAsString());
+	movie.setAddDate(Utils::dateAsString());
 	movie.setAvailable(true);
 
 	DB::getDB().createMovie(movie);
+}
+
+int Show::mainDefaultMenu() {
+	std::cout << std::endl << "----- MOVIE RENTAL MAIN MENU -----" << std::endl;
+	if (Auth::getLoggedUser()) {
+		std::cout << "Welcome, " << Auth::getLoggedUser().value().getFirstName() << " " << Auth::getLoggedUser().value().getLastName() << "." << std::endl;
+	}
+
+	std::cout << std::endl << "Select option:" << std::endl
+		<< "1) Show all movies" << std::endl
+		<< "2) " << (Auth::getLoggedUser() ? "Logout" : "Login") << std::endl
+		<< "3) " << (Auth::getLoggedUser() ? "Show my rents" : "Register") << std::endl
+		<< "9) Exit" << std::endl;
+
+	int input;
+	std::cin.clear();
+	std::cin >> input;
+	std::cout << std::endl;
+
+	switch (input) {
+	case 1:
+		menuAllMovies();
+		break;
+	case 2:
+		menuLoginLogout();
+		break;
+	case 3:
+		menuRentRegister();
+		break;
+	default:
+		break;
+	}
+
+	return input;
+
+}
+
+int Show::mainAdminMenu() {
+	std::cout << std::endl << "----- MOVIE RENTAL ADMIN PANEL -----" << std::endl;
+	if (Auth::getLoggedUser()) {
+		std::cout << "Welcome, " << Auth::getLoggedUser().value().getFirstName() << " " << Auth::getLoggedUser().value().getLastName() << "." << std::endl;
+	}
+
+	std::cout << std::endl << "Select option:" << std::endl
+		<< "1) Show all movies" << std::endl
+		<< "2) " << (Auth::getLoggedUser() ? "Logout" : "Login") << std::endl
+		<< "3) " << (Auth::getLoggedUser() ? "Show my rents" : "Register") << std::endl
+		<< "4) Add movie" << std::endl
+		<< "9) Exit" << std::endl;
+
+	int input;
+	std::cin.clear();
+	std::cin >> input;
+	std::cout << std::endl;
+
+	switch (input) {
+	case 1:
+		menuAllMovies();
+		break;
+	case 2:
+		menuLoginLogout();
+		break;
+	case 3:
+		menuRentRegister();
+		break;
+	case 4:
+		addMovie();
+		break;
+	default:
+		break;
+	}
+
+	return input;
+}
+
+void Show::userRents(std::string login) {
+	std::vector<Rent> rents = DB::getDB().selectUserRents(login);
+	int i = 1;
+	for (auto rent : rents) {
+		if (DB::getDB().getMovie(rent.getMovieId())) {
+			std::cout << i << ") " << DB::getDB().getMovie(rent.getMovieId()).value().getName()
+				<< " | Rent date: " << rent.getRentDate()
+				<< " | Return before: " << rent.getExpReturnDate() << std::endl;
+			i++;
+		}
+	}
 }
 
 void Show::allMovies(SortOrder order, MovieParams param) {

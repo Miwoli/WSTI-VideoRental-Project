@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "Model.hpp"
 #include "Utils.hpp"
 
 enum class MovieParams {
@@ -15,7 +16,7 @@ enum class MovieParams {
 	AVAILABLE
 };
 
-class Movie {
+class Movie: public Model {
 	int id;
 	std::string name;
 	std::string genre;
