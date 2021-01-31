@@ -28,6 +28,9 @@ public:
 	void createUser(User, std::string passwordHash, std::string salt);
 	void createRent(Rent);
 	void updateMovie(Movie);
+	void updateRent(Rent);
+	void removeMovie(Movie);
+	int userActiveRentsCount(User);
 	bool areAnyUsers();
 };
 

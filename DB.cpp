@@ -204,9 +204,10 @@ void DB::createRent(Rent rent) {
 
 void DB::updateMovie(Movie updated) {
 	std::vector<Movie> allMovies = selectMovies();
+	int updatedIndex = updated.getId() - 1;
 
-	allMovies[updated.getId() - 1] = updated;
-	openedDB.open("movies.csv", std::fstream::trunc);
+	allMovies[updatedIndex] = updated;
+	openedDB.open("movies.csv", std::fstream::trunc | std::fstream::out); // Removing everything, to write again updated version. C++, Y U drunk?
 	int index = 0;
 
 	for (auto movie : allMovies) {
@@ -214,8 +215,59 @@ void DB::updateMovie(Movie updated) {
 			openedDB << std::endl;
 		}
 		openedDB << movie.modelToString();
+		index++;
 	}
 	disconnect();
+}
+
+void DB::updateRent(Rent updated) {
+	std::vector<Rent> allRents = selectRents();
+	int updatetIndex = updated.getId() - 1;
+
+	allRents[updatetIndex] = updated;
+	openedDB.open("rents.csv", std::fstream::trunc | std::fstream::out);
+	int index = 0;
+
+	for (auto rent : allRents) {
+		if (index != 0) {
+			openedDB << std::endl;
+		}
+		openedDB << rent.modelToString();
+		index++;
+	}
+	disconnect();
+}
+
+void DB::removeMovie(Movie removed) {
+	if (!removed.getAvailable()) return;
+	std::vector<Movie> allMovies = selectMovies();
+
+	allMovies.erase(allMovies.begin() + removed.getId() - 1);
+	openedDB.open("movies.csv", std::fstream::trunc | std::fstream::out);
+	int index = 0;
+
+	for (auto movie : allMovies) {
+		if (index != 0) {
+			openedDB << std::endl;
+		}
+		if ((index - 1) >= removed.getId() - 2) {
+			movie.setId(movie.getId() - 1);
+		}
+		openedDB << movie.modelToString();
+		index++;
+	}
+	disconnect();
+}
+
+int DB::userActiveRentsCount(User user) {
+	std::vector<Rent> userRents = selectUserRents(user.getLogin());
+	int counter = 0;
+
+	for (auto rent : userRents) {
+		if (rent.getReturnDate() == "") counter++;
+	}
+
+	return counter;
 }
 
 bool DB::areAnyUsers() {

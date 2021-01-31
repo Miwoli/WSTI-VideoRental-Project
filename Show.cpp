@@ -149,7 +149,7 @@ void Show::registerUser() {
 		correctInput = true;
 		std::cout << "Login: ";
 		std::cin >> text;
-		if (DB::getDB().getUser(text)) {
+		if (Validation::isLoginUsed(text)) {
 			correctInput = false;
 			std::cout << std::endl << "Login already used." << std::endl;
 		}
@@ -254,7 +254,7 @@ bool Show::sortByAvailableDesc(Movie lhs, Movie rhs) {
 void Show::mainMenu() {
 
 	std::cout << "Welcome to Movie Rental Client. Created by: Michal 'Miwoli' Wolinski. All rights reserverd @2021"
-		<< std::endl << "Press any key to start..." << std::endl << std::endl;
+		<< std::endl << "Press enter to start..." << std::endl << std::endl;
 	int response;
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
@@ -278,7 +278,10 @@ void Show::movieDetails(int id) {
 		<< movie.getDescription() << std::endl << std::endl
 		<< "Available since: " << movie.getAddDate() << std::endl << std::endl;
 
-	if (Auth::getLoggedUser() && movie.getAvailable()) {
+	if (Auth::getLoggedUser()
+		&& movie.getAvailable()
+		&& DB::getDB().userActiveRentsCount(Auth::getLoggedUser().value()) < 3
+	) {
 		rentMovie(Auth::getLoggedUser().value(), movie);
 	}
 }
@@ -292,6 +295,10 @@ void Show::addMovie() {
 
 	std::cout << "Name: ";
 	std::getline(std::cin >> std::ws, text);
+	while (Validation::isMovieNameUsed(text)) {
+		std::cout << "A movie with that name already exists!" << std::endl;
+		std::getline(std::cin >> std::ws, text);
+	}
 	movie.setName(text);
 	std::cout << std::endl;
 
@@ -315,8 +322,10 @@ void Show::addMovie() {
 	movie.setDescription(text);
 	std::cout << std::endl;
 
-	std::cout << "Rating (1-5, decimals with .): "; // TODO: Create class validator, validate inputs
-	std::cin >> decimal;
+	do {
+		std::cout << "Rating (1-10, decimals with .): ";
+		std::cin >> decimal;
+	} while (!Validation::isDecimallBetween(decimal, 1, 10));
 	movie.setRating(decimal);
 	std::cout << std::endl;
 
@@ -374,9 +383,10 @@ int Show::mainAdminMenu() {
 
 	std::cout << std::endl << "Select option:" << std::endl
 		<< "1) Show all movies" << std::endl
-		<< "2) " << (Auth::getLoggedUser() ? "Logout" : "Login") << std::endl
-		<< "3) " << (Auth::getLoggedUser() ? "Show my rents" : "Register") << std::endl
+		<< "2) Logout" << std::endl
+		<< "3) Show my rents" << std::endl
 		<< "4) Add movie" << std::endl
+		<< "5) Delete movie" << std::endl
 		<< "9) Exit" << std::endl;
 
 	int input;
@@ -397,6 +407,9 @@ int Show::mainAdminMenu() {
 	case 4:
 		addMovie();
 		break;
+	case 5:
+		removeMovie();
+		break;
 	default:
 		break;
 	}
@@ -406,14 +419,96 @@ int Show::mainAdminMenu() {
 
 void Show::userRents(std::string login) {
 	std::vector<Rent> rents = DB::getDB().selectUserRents(login);
+	std::vector<Rent> returnedRents;
+	std::vector<Rent> activeRents;
+	std::copy_if(rents.begin(), rents.end(), std::back_inserter(returnedRents), [](Rent obj) { return obj.getReturnDate() != ""; });
+	std::copy_if(rents.begin(), rents.end(), std::back_inserter(activeRents), [](Rent obj) { return obj.getReturnDate() == ""; });
+
+	for (auto rent : returnedRents) {
+		if (DB::getDB().getMovie(rent.getMovieId())) {
+			std::cout << DB::getDB().getMovie(rent.getMovieId()).value().getName()
+				<< " | Rent date: " << rent.getRentDate()
+				<< " | Returned date: " << rent.getReturnDate() << std::endl;
+		}
+	}
+
+	std::cout << "-------------------------------------------" << std::endl << std::endl;
+
 	int i = 1;
-	for (auto rent : rents) {
+	for (auto rent : activeRents) {
 		if (DB::getDB().getMovie(rent.getMovieId())) {
 			std::cout << i << ") " << DB::getDB().getMovie(rent.getMovieId()).value().getName()
 				<< " | Rent date: " << rent.getRentDate()
 				<< " | Return before: " << rent.getExpReturnDate() << std::endl;
 			i++;
 		}
+	}
+
+	if (rents.size() > 0) {
+		char input;
+		do {
+			std::cin.clear();
+			std::cout << "Do you want to return a movie? [y/n]" << std::endl;
+			std::cin >> input;
+		} while (input != 'Y' && input != 'y' && input != 'N' && input != 'n');
+		if (input == 'Y' || input == 'y') {
+			int movieId;
+			do {
+				std::cin.clear();
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				std::cout << "Type movie ID you wish to return: ";
+				std::cin >> movieId;
+
+				if ((movieId > rents.size() || movieId <= 0) || !std::cin) std::cout << "There's no movie with that ID" << std::endl;
+			} while ((movieId > rents.size() || movieId <= 0) || !std::cin);
+
+			movieId--;
+			Movie updatedMovie = DB::getDB().getMovie(rents[movieId].getMovieId()).value();
+			updatedMovie.setAvailable(true);
+			DB::getDB().updateMovie(updatedMovie);
+			Rent updatedRent = rents[movieId];
+			updatedRent.setReturnDate(Utils::dateAsString());
+			DB::getDB().updateRent(updatedRent);
+		}
+	}
+}
+
+void Show::removeMovie() {
+	std::vector<Movie> movies = DB::getDB().selectMovies();
+
+	for (auto movie : movies) {
+		std::string isAvailable = movie.getAvailable() ? "Available" : "Not available";
+		std::cout << movie.getId() << ") "
+			<< movie.getName() << " | "
+			<< movie.getDirector() << " | "
+			<< movie.getLength() << "min. | "
+			<< movie.getGenre() << " | "
+			<< movie.getRating() << " | "
+			<< movie.getAddDate() << " | "
+			<< isAvailable
+			<< std::endl;
+	}
+
+
+	int moviesAmount = movies.size();
+	int movieId;
+
+	do {
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		std::cout << "Type in movie ID you want to remove" << std::endl;
+
+		std::cin >> movieId;
+
+		if ((movieId > moviesAmount || movieId <= 0) || !std::cin) std::cout << "There's no movie with that ID" << std::endl;
+	} while ((movieId > moviesAmount || movieId <= 0) || !std::cin);
+
+	movieId--;
+
+	if (Validation::isMovieRent(movies[movieId])) {
+		std::cout << "Cannot delete movie, that is rent by somebody!" << std::endl;
+	} else {
+		DB::getDB().removeMovie(movies[movieId]);
 	}
 }
 
@@ -509,8 +604,8 @@ void Show::allMovies(SortOrder order, MovieParams param) {
 			std::cout << "Type movie ID you wish to see details: ";
 			std::cin >> movieId;
 
-			if ((movieId > moviesAmount) || !std::cin) std::cout << "There's no movie with that ID" << std::endl;
-		} while ((movieId > moviesAmount) || !std::cin);
+			if ((movieId > moviesAmount || movieId <=0) || !std::cin) std::cout << "There's no movie with that ID" << std::endl;
+		} while ((movieId > moviesAmount || movieId <= 0) || !std::cin);
 
 		movieDetails(movieId);
 	}

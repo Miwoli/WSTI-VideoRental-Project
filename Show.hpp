@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include "Validation.hpp"
 #include "DB.hpp"
 #include "Movie.hpp"
 
@@ -29,7 +30,7 @@ class Show {
 	static void registerUser();
 	static void loginUser();
 	static void rentMovie(User, Movie);
-	static void returnMovie(User);
+	static void returnMovie(User, Movie);
 	static void menuAllMovies();
 	static void menuLoginLogout();
 	static void menuRentRegister();
@@ -39,6 +40,7 @@ class Show {
 	static void userRents(std::string login);
 	static void allMovies(SortOrder order = SortOrder::ASC, MovieParams param = MovieParams::ID);
 	static void addMovie();
+	static void removeMovie();
 
 public:
 	static void mainMenu();

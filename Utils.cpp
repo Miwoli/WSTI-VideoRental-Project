@@ -40,12 +40,10 @@ std::string Utils::dateAsString(int dayOffset) {
     boost::gregorian::date dateObj = timelocal.date();
     boost::posix_time::time_duration timeDuration = timelocal.time_of_day();
 
-    //boost::gregorian::date_duration offset(dayOffset);
     boost::posix_time::ptime timeUTC = boost::posix_time::second_clock::universal_time();
     boost::posix_time::hours offset(dayOffset * 24);
 
     return boost::posix_time::to_iso_extended_string(timeUTC + offset);
-    //return  boost::gregorian::to_iso_extended_string(dateObj + offset);
 }
 
 bool Utils::isEmptyFile(std::fstream& file) {
